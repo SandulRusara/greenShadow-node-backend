@@ -35,3 +35,32 @@ export async function deleteCrop(id:string) {
         console.log("error deleting crop", err);
     }
 }
+
+export async function updateCrop(id:string,c:Crop) {
+   try {
+       const updateCrop =  await prisma.crop.update({
+           where:{id:c.id},
+           data:{
+               commonName:c.commonName,
+               scientificName:c.scientificName,
+               category:c.category,
+               season:c.season,
+               fieldDetails:c.fieldDetails,
+               imageUrl:c.imageUrl
+
+           }
+       })
+       console.log('Crop updated :',updateCrop);
+       return updateCrop;
+   } catch (err) {
+       console.log("error updating crop", err);
+   }
+}
+
+export async function getAllCrop(){
+    try{
+        return await prisma.crop.findMany();
+    }catch(err){
+        console.log("error getting crop from prisma data",err);
+    }
+}
