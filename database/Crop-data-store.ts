@@ -17,7 +17,7 @@ export async function addCrop(c:Crop) {
 
             }
         })
-        console.log("ceop added :",addCrop);
+        console.log("crop added :",addCrop);
         return addCrop;
     }catch (err) {
         console.log("err adding crop ",err);
