@@ -1,5 +1,5 @@
 export default class Crop {
-    id!: number;
+    id!: string;
     commonName!: string;
     scientificName!: string;
     category!: string;

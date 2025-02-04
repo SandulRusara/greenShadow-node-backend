@@ -36,7 +36,7 @@ export async function deleteCrop(id:string) {
     }
 }
 
-export async function updateCrop(id:string,c:Crop) {
+export async function updateCrop(id: string, c: Crop) {
    try {
        const updateCrop =  await prisma.crop.update({
            where:{id:c.id},
