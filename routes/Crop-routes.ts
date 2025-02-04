@@ -10,7 +10,7 @@ router.post("/add",async (req, res)=>{
         const Crop = await addCrop(crop);
         res.json(crop);
     }catch (err) {
-        console.log("srro adding crop",err);
+        console.log("erro adding crop",err);
         res.status(400).send("erro adding crop");
     }
 
