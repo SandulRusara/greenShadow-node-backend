@@ -13,8 +13,8 @@ router.post("/add",async (req, res)=>{
         const fieldd = await addField(field);
         res.json(field);
     }catch (err) {
-        console.log("erro adding field",err);
-        res.status(400).send("erro adding field");
+        console.log("error adding field",err);
+        res.status(400).send("error adding field");
     }
 
 })
@@ -25,7 +25,7 @@ router.delete("/delete/:id",async (req, res)=>{
         const deleted = await deleteField(id);
         res.json(deleted);
     }catch (err) {
-        console.log("erro delete field",err);
+        console.log("error delete field",err);
 
     }
 })

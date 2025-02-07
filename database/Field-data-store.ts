@@ -8,7 +8,16 @@ export async function addField(f:Field) {
     try {
         const addField = await prisma.crop.create({
             data:{
-
+                fieldCode:f.fieldCode,
+                name:f.name,
+                location:f.location,
+                extentSize:f.extentSize,
+                fieldImage1:f.fieldImage1,
+                fieldImage2:f.fieldImage2,
+                equipmentsList:f.equipmentsList,
+                memberCodeList:f.memberCodeList,
+                logCodeList:f.logCodeList,
+                cropCodeList:f.memberCodeList
 
 
             }
@@ -35,9 +44,17 @@ export async function deleteField(id:string) {
 export async function updateField(id: string, f: Field) {
     try {
         const updateField =  await prisma.crop.update({
-            where:{},
+            where:{fieldCode:f.fieldCode},
             data:{
-
+                name:f.name,
+                location:f.location,
+                extentSize:f.extentSize,
+                fieldImage1:f.fieldImage1,
+                fieldImage2:f.fieldImage2,
+                equipmentsList:f.equipmentsList,
+                memberCodeList:f.memberCodeList,
+                logCodeList:f.logCodeList,
+                cropCodeList:f.memberCodeList
 
             }
         })
