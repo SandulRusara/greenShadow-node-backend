@@ -13,21 +13,108 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Field {
-  id         Int     @id @default(autoincrement())
-  fieldName  String  @unique
-  location   String
-  extentSize Float
-  fieldImage String? // Optional, storing image path
-  crops      Crop[] // One-to-Many Relationship: A field can have multiple crops
-}
-
 model Crop {
   id             Int     @id @default(autoincrement())
-  commonName     String  @unique
+  commonName     String
   scientificName String
   category       String
-  cropImage      String? // Optional field for image path
-  fieldId        Int // Foreign key reference
+  cropImage      String? @db.Text // Use Text type to store large base64 string
+  fieldId        Int
   field          Field   @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  logs           Log[]
+}
+
+model Equipment {
+  id        Int       @id @default(autoincrement())
+  equipName String
+  equipType EquipType
+  status    Status
+  staffId   Int?
+  fieldId   Int
+  staff     Staff?    @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+}
+
+model Field {
+  id         Int         @id @default(autoincrement())
+  fieldName  String      @unique
+  location   String
+  extentSize Float
+  fieldImage String? // Stores image path
+  crops      Crop[]
+  logs       Log[]
+  staff      Staff[]
+  equipment  Equipment[]
+  Vehicle    Vehicle[]
+}
+
+model Log {
+  id       Int      @id @default(autoincrement())
+  logName  String
+  logDate  DateTime
+  logImage String? // Stores image path
+  fieldId  Int
+  cropId   Int
+  staffId  Int? // Make staffId optional
+
+  field Field  @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  crop  Crop   @relation(fields: [cropId], references: [id], onDelete: Cascade)
+  staff Staff? @relation(fields: [staffId], references: [id], onDelete: SetNull)
+}
+
+model Staff {
+  id          Int         @id @default(autoincrement())
+  name        String
+  designation String
+  gender      Gender
+  joinedDate  DateTime
+  dob         DateTime
+  address     String
+  contact     String      @unique
+  email       String      @unique
+  fieldId     Int
+  field       Field       @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  equipment   Equipment[]
+  logs        Log[]
+  vehicles    Vehicle[]
+}
+
+model Vehicle {
+  id                 Int      @id @default(autoincrement())
+  licensePlateNumber String   @unique
+  category           String
+  fuelType           FuelType
+  status             Status
+  remarks            String?
+  fieldId            Int
+  staffId            Int? // staffId is optional
+
+  // Relationships
+  field Field  @relation(fields: [fieldId], references: [id])
+  staff Staff? @relation(fields: [staffId], references: [id]) // staff relationship is optional
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum EquipType {
+  TRACTOR
+  HARVESTER
+  PLOW
+  SPRAYER
+  OTHER
 }

@@ -22,6 +22,9 @@ export async function addCrop(c: Crop) {
         throw err;
     }
 }
+
+
+
 //
 // export async function deleteCrop(id:number) {
 //     try {

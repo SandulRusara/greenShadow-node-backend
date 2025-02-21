@@ -3,7 +3,7 @@ export default class Crop {
     commonName!: string;
     scientificName!: string;
     category!: string;
-    cropImage?: string | null;
+    cropImage?: string;
     fieldId!: number;
 }
 

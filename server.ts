@@ -1,24 +1,27 @@
-import express from 'express';
+import express from "express";
+import cors from "cors";
 import cropRoutes from "./routes/Crop-routes";
+import vehicleRoutes from "./routes/vehicle-routes";
 
 
 const app = express();
+
+// Enable CORS globally
+app.use(cors());
+
+// Use JSON middleware
 app.use(express.json());
 
-app.use('/',(req,res,next)=>{
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, content-type');
+// Routes
+app.use("/crop", cropRoutes);
+app.use("/vehicle", vehicleRoutes); // Add Vehicle routes
 
-    next();
-})
+// Catch-all route for unhandled routes
+app.use("*", (req, res) => {
+    res.status(404).send("Not Found");
+});
 
-app.use('/crop',cropRoutes);
-
-app.listen(3000, (err=>{
+// Start server
+app.listen(3000, () => {
     console.log("Server running on port 3000");
-}));
-
-app.use('/',(req,res,next)=>{
-    res.status(200).send('Not Found');
-})
+});
