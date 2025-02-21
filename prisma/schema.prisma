@@ -12,3 +12,22 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Field {
+  id         Int     @id @default(autoincrement())
+  fieldName  String  @unique
+  location   String
+  extentSize Float
+  fieldImage String? // Optional, storing image path
+  crops      Crop[] // One-to-Many Relationship: A field can have multiple crops
+}
+
+model Crop {
+  id             Int     @id @default(autoincrement())
+  commonName     String  @unique
+  scientificName String
+  category       String
+  cropImage      String? // Optional field for image path
+  fieldId        Int // Foreign key reference
+  field          Field   @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+}

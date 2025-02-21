@@ -1,9 +1,11 @@
 export default class Crop {
-    id!: string;
+    id?: number;
     commonName!: string;
     scientificName!: string;
     category!: string;
-    season!: string;
-    fieldDetails!: string;
-    imageUrl!: string;
+    cropImage?: string | null;
+    fieldId!: number;
 }
+
+
+
