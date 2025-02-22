@@ -15,7 +15,7 @@ datasource db {
 
 model Crop {
   id             Int     @id @default(autoincrement())
-  commonName     String
+  commonName     String  @unique
   scientificName String
   category       String
   cropImage      String? @db.Text // Use Text type to store large base64 string

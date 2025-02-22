@@ -65,4 +65,34 @@ export async function getAllVehicles() {
         throw new Error("Failed to fetch vehicles");  // Throw error if something goes wrong
     }
 }
-
+// Update vehicle function
+// export async function updateVehicle(licenseNumber: string, vehicle: Vehicle) {
+//     try {
+//         const existingVehicle = await prisma.vehicle.findUnique({
+//             where: { licensePlateNumber: licenseNumber },
+//         });
+//
+//         if (!existingVehicle) {
+//             return null;  // Return null if vehicle is not found
+//         }
+//
+//         // Update the vehicle using Prisma's `update` method
+//         const updatedVehicle = await prisma.vehicle.update({
+//             where: { licensePlateNumber: licenseNumber },
+//             data: {
+//                 licensePlateNumber: vehicle.licensePlateNumber || existingVehicle.licensePlateNumber,
+//                 category: vehicle.category || existingVehicle.category,
+//                 fuelType: vehicle.fuelType ? vehicle.fuelType : existingVehicle.fuelType, // Use correct enum or string
+//                 status: vehicle.status ? vehicle.status : existingVehicle.status, // Use correct enum or string
+//                 remarks: vehicle.remarks || existingVehicle.remarks,
+//                 fieldId: vehicle.fieldId || existingVehicle.fieldId,  // Ensure fieldId exists in the schema
+//                 staffId: vehicle.staffId || existingVehicle.staffId,
+//             },
+//         });
+//
+//         return updatedVehicle;  // Return the updated vehicle
+//     } catch (error) {
+//         console.error("Error updating vehicle:", error);
+//         throw new Error("Failed to update vehicle");
+//     }
+// }

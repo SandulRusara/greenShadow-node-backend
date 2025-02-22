@@ -22,7 +22,67 @@ export async function addCrop(c: Crop) {
         throw err;
     }
 }
+export async function deleteCrop(commonName: string): Promise<{ message: string }> {
+    try {
+        // Find the crop by commonName
+        const existingCrop = await prisma.crop.findFirst({
+            where: { commonName },
+        });
 
+        if (!existingCrop) {
+            throw new Error("Crop not found");
+        }
+
+        // Delete using the unique ID
+        await prisma.crop.delete({
+            where: { id: existingCrop.id }, // Use 'id' instead of 'commonName'
+        });
+
+        return { message: "Crop deleted successfully" };
+    } catch (error) {
+        console.error("Error deleting crop:", error);
+        throw new Error("Failed to delete crop");
+    }
+}
+
+// Function to get all crops
+export async function getAllCrops() {
+    try {
+        const crops = await prisma.crop.findMany();
+        return crops;
+    } catch (error) {
+        console.error("Error retrieving crops:", error);
+        throw new Error("Failed to fetch crops");
+    }
+}
+export async function updateCrop(commonName: string, cropData: any) {
+    try {
+        // Check if the crop exists
+        const existingCrop = await prisma.crop.findUnique({
+            where: { commonName },
+        });
+
+        if (!existingCrop) {
+            throw new Error("Crop not found");
+        }
+
+        // Update the crop
+        const updatedCrop = await prisma.crop.update({
+            where: { id: existingCrop.id },
+            data: {
+                scientificName: cropData.scientificName,
+                category: cropData.category,
+                fieldId: Number(cropData.fieldName),
+                cropImage: cropData.cropImage || existingCrop.cropImage,
+            },
+        });
+
+        return updatedCrop;
+    } catch (error) {
+        console.error("Error updating crop:", error);
+        throw new Error("Failed to update crop");
+    }
+}
 
 
 //

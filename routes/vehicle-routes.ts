@@ -75,4 +75,24 @@ router.get("/view", async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: "Internal Server Error" });  // If error occurs, return 500
     }
 });
+
+// router.put("/update/:licenseNumber", async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { licenseNumber } = req.params;  // Extract licenseNumber from the URL parameter
+//         const vehicle = req.body;  // Get the updated vehicle data from the request body
+//
+//         // Call the service layer to update the vehicle
+//         const updatedVehicle = await updateVehicle(licenseNumber, vehicle);
+//
+//         if (updatedVehicle) {
+//             res.status(200).json(updatedVehicle);  // Return the updated vehicle if successful
+//         } else {
+//             res.status(404).json({ message: "Vehicle not found" });  // If vehicle not found, return 404
+//         }
+//     } catch (error) {
+//         console.error("Error updating vehicle:", error);
+//         res.status(500).json({ error: "Internal Server Error" });  // Handle internal server errors
+//     }
+// });
+
 export default router;
