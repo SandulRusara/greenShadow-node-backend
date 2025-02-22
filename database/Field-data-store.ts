@@ -1,74 +1,45 @@
-import {PrismaClient} from '@prisma/client';
-import {Field} from "../model/Field";
-
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function addField(f:Field) {
+// Function to add a new field to the database
+export const addField = async (fieldName: string, location: string, extentSize: string, fieldImageBase64: string | null) => {
     try {
-        const addField = await prisma.crop.create({
-            data:{
-                fieldCode:f.fieldCode,
-                name:f.name,
-                location:f.location,
-                extentSize:f.extentSize,
-                fieldImage1:f.fieldImage1,
-                fieldImage2:f.fieldImage2,
-                equipmentsList:f.equipmentsList,
-                memberCodeList:f.memberCodeList,
-                logCodeList:f.logCodeList,
-                cropCodeList:f.memberCodeList
-
-
-            }
-        })
-        console.log("field added :",addField);
-        return addField;
-    }catch (err) {
-        console.log("err adding field ",err);
-    }
-}
-
-export async function deleteField(id:string) {
-    try {
-        const deleteField = await prisma.crop.delete({
-            where:{id:id}
+        // Check if fieldName already exists
+        const existingField = await prisma.field.findUnique({
+            where: { fieldName },
         });
-        console.log("delete field",deleteField);
-        return deleteField;
-    }catch (err) {
-        console.log("error deleting field", err);
-    }
-}
 
-export async function updateField(id: string, f: Field) {
+        if (existingField) {
+            throw new Error("Field with this name already exists.");
+        }
+
+        // Create a new field record in the database
+        const newField = await prisma.field.create({
+            data: {
+                fieldName,
+                location,
+                extentSize: parseFloat(extentSize),
+                fieldImage: fieldImageBase64, // Save Base64 string in the database
+            },
+        });
+
+        return newField;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(error.message || "Error adding field");
+        } else {
+            throw new Error("An unknown error occurred");
+        }
+    }
+};
+
+// Function to fetch all fields from the database
+export const getAllFields = async () => {
     try {
-        const updateField =  await prisma.crop.update({
-            where:{fieldCode:f.fieldCode},
-            data:{
-                name:f.name,
-                location:f.location,
-                extentSize:f.extentSize,
-                fieldImage1:f.fieldImage1,
-                fieldImage2:f.fieldImage2,
-                equipmentsList:f.equipmentsList,
-                memberCodeList:f.memberCodeList,
-                logCodeList:f.logCodeList,
-                cropCodeList:f.memberCodeList
-
-            }
-        })
-        console.log('Field updated :',updateField);
-        return updateField;
-    } catch (err) {
-        console.log("error updating field", err);
+        const fields = await prisma.field.findMany();
+        return fields;
+    } catch (error) {
+        throw new Error("Error fetching fields");
     }
-}
-
-export async function getAllField(){
-    try{
-        return await prisma.crop.findMany();
-    }catch(err){
-        console.log("error getting field from prisma data",err);
-    }
-}
+};

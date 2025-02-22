@@ -40,7 +40,7 @@ model Field {
   fieldName  String      @unique
   location   String
   extentSize Float
-  fieldImage String? // Stores image path
+  fieldImage String?     @db.Text // Using @db.Text to allow large strings
   crops      Crop[]
   logs       Log[]
   staff      Staff[]

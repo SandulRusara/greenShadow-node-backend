@@ -1,54 +1,53 @@
-import express from "express";
-import {addField, deleteField, getAllField, updateField} from "../database/Field-data-store";
-import {deleteCrop} from "../database/Crop-data-store";
-import Crop from "../model/Crop";
-import {Field} from "../model/Field";
-
-
+import express, { Request, Response } from "express";
+import multer from "multer";
+import {addField, getAllFields} from "../database/Field-data-store"; // Import the addField function
 
 const router = express.Router();
-router.post("/add",async (req, res)=>{
-    const field:Field=req.body;
+
+// Set up multer for file handling (in-memory storage for Base64 conversion)
+const storage = multer.memoryStorage(); // Use memory storage to directly handle Base64 encoding
+const upload = multer({ storage: storage });
+
+// Route to add a new field with optional image upload
+router.post("/add", upload.single("fieldImage"), async (req: Request, res: Response): Promise<void> => {
     try {
-        const fieldd = await addField(field);
-        res.json(field);
-    }catch (err) {
-        console.log("error adding field",err);
-        res.status(400).send("error adding field");
+        // Extract data from the body and file (if provided)
+        const { fieldName, location, extentSize } = req.body;
+        let fieldImageBase64 = null;
+
+        // If an image is uploaded, convert it to Base64
+        if (req.file) {
+            fieldImageBase64 = req.file.buffer.toString("base64"); // Convert image buffer to Base64 string
+        }
+
+        // Call the addField function from the data store
+        const newField = await addField(fieldName, location, extentSize, fieldImageBase64);
+
+        // Send the newly created field as a response
+        res.status(201).json(newField);
+    } catch (error) {
+        console.error("Error adding field:", error);
+
+        // Cast the error to a specific type (Error) to access message property
+        if (error instanceof Error) {
+            res.status(500).json({ error: error.message || "Error adding field" });
+        } else {
+            res.status(500).json({ error: "An unknown error occurred" });
+        }
     }
+});
 
-})
-
-router.delete("/delete/:id",async (req, res)=>{
-    const id:string = req.params.id;
+router.get("/view", async (req: Request, res: Response): Promise<void> => {
     try {
-        const deleted = await deleteField(id);
-        res.json(deleted);
-    }catch (err) {
-        console.log("error delete field",err);
+        // Call the getAllFields function from the data store
+        const fields = await getAllFields();
 
+        // Send the fields as a response
+        res.status(200).json(fields);
+    } catch (error) {
+        console.error("Error fetching fields:", error);
+        res.status(500).json({ error: "Error fetching fields" });
     }
-})
-
-router.put("/update/:id",async (req, res) => {
-    const id:string = req.params.id;
-    const field : Field = req.body;
-
-    try{
-        const updatedField = await updateField(id,field);
-        res.json(updatedField);
-    }catch(err){
-        console.log("error updating field", err);
-    }
-})
-router.get("/view", async (req, res) => {
-    try{
-        const fieldsGetAll=  await getAllField();
-        res.json(fieldsGetAll);
-    }catch(err){
-        console.log("error getting field", err);
-    }
-})
-
+});
 
 export default router;
