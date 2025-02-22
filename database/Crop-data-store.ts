@@ -3,23 +3,45 @@ import Crop from "../model/Crop";
 
 const prisma = new PrismaClient();
 
-export async function addCrop(c: Crop) {
+export async function addCrop(commonName: string, scientificName: string, category: string, fieldId: string, cropImageBuffer?: Buffer): Promise<any> {
     try {
+        // Validate required fields
+        if (!commonName || !scientificName || !category || !fieldId) {
+            throw new Error("Missing required fields");
+        }
+
+        // Convert fieldId to number
+        const fieldIdNumber = Number(fieldId);
+        if (isNaN(fieldIdNumber)) {
+            throw new Error("Invalid fieldId");
+        }
+
+        // Convert image to Base64 if provided
+        let base64Image: string | null = null;
+        if (cropImageBuffer) {
+            base64Image = cropImageBuffer.toString("base64");
+        }
+
+        // Create new crop in the database
         const newCrop = await prisma.crop.create({
             data: {
-                id: c.id,
-                commonName: c.commonName,
-                scientificName: c.scientificName,
-                category: c.category,
-                cropImage: c.cropImage,
-                fieldId: c.fieldId,
+                commonName,
+                scientificName,
+                category,
+                fieldId: fieldIdNumber,
+                cropImage: base64Image,
             },
         });
-        console.log('Crop added:', newCrop);
+
         return newCrop;
-    } catch (err) {
-        console.error('Error adding crop:', err);
-        throw err;
+    } catch (error: unknown) {
+        // TypeScript check to ensure error is an instance of Error
+        if (error instanceof Error) {
+            throw new Error(error.message || "Error adding crop");
+        } else {
+            // Handle case where error is not an instance of Error
+            throw new Error("Unknown error occurred while adding crop");
+        }
     }
 }
 export async function deleteCrop(commonName: string): Promise<{ message: string }> {
