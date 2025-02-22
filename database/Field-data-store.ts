@@ -56,3 +56,41 @@ export const deleteField = async (fieldName: string) => {
         throw new Error(`Field with name ${fieldName} not found`);
     }
 };
+
+// Function to update a field in the database
+export const updateField = async (
+    fieldName: string,
+    location: string,
+    extentSize: string,
+    fieldImageBase64: string | null
+) => {
+    try {
+        // Find the existing field
+        const existingField = await prisma.field.findUnique({
+            where: { fieldName },
+        });
+
+        if (!existingField) {
+            throw new Error("Field not found.");
+        }
+
+        // Update the field record
+        const updatedField = await prisma.field.update({
+            where: { fieldName },
+            data: {
+                location,
+                extentSize: parseFloat(extentSize),
+                fieldImage: fieldImageBase64, // Update with the new Base64 image or null if no image is uploaded
+            },
+        });
+
+        return updatedField;
+    } catch (error: unknown) {
+        // Type assertion to check if the error is an instance of Error
+        if (error instanceof Error) {
+            throw new Error(error.message || "Error updating field");
+        } else {
+            throw new Error("An unknown error occurred while updating the field.");
+        }
+    }
+};

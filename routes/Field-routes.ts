@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
-import {addField, deleteField, getAllFields} from "../database/Field-data-store"; // Import the addField function
+import {addField, deleteField, getAllFields, updateField} from "../database/Field-data-store"; // Import the addField function
 
 const router = express.Router();
 
@@ -65,6 +65,35 @@ router.delete("/delete/:fieldName", async (req: Request, res: Response): Promise
         // Handle 'unknown' type for error and ensure it has a 'message'
         if (error instanceof Error) {
             res.status(500).json({ error: error.message || "Error deleting field" });
+        } else {
+            res.status(500).json({ error: "An unknown error occurred" });
+        }
+    }
+});
+
+
+// Route to update a field with optional image upload
+router.put("/update/:fieldName", upload.single("fieldImage"), async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { fieldName } = req.params; // Extract the fieldName from the URL
+        const { location, extentSize } = req.body; // Extract other form data
+        let fieldImageBase64 = null;
+
+        // Check if a file is uploaded and convert it to Base64
+        if (req.file) {
+            fieldImageBase64 = req.file.buffer.toString("base64");
+        }
+
+        // Call the updateField function from the data store
+        const updatedField = await updateField(fieldName, location, extentSize, fieldImageBase64);
+
+        // Send the updated field as a response
+        res.status(200).json(updatedField);
+    } catch (error) {
+        console.error("Error updating field:", error);
+        // Handle the 'unknown' type for error and ensure it has a 'message'
+        if (error instanceof Error) {
+            res.status(500).json({ error: error.message || "Error updating field" });
         } else {
             res.status(500).json({ error: "An unknown error occurred" });
         }
