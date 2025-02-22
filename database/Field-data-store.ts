@@ -43,3 +43,16 @@ export const getAllFields = async () => {
         throw new Error("Error fetching fields");
     }
 };
+
+// Function to delete a field from the database by field name
+export const deleteField = async (fieldName: string) => {
+    try {
+        // Delete the field by its name
+        const deletedField = await prisma.field.delete({
+            where: { fieldName },
+        });
+        return deletedField;
+    } catch (error) {
+        throw new Error(`Field with name ${fieldName} not found`);
+    }
+};

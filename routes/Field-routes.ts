@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
-import {addField, getAllFields} from "../database/Field-data-store"; // Import the addField function
+import {addField, deleteField, getAllFields} from "../database/Field-data-store"; // Import the addField function
 
 const router = express.Router();
 
@@ -47,6 +47,27 @@ router.get("/view", async (req: Request, res: Response): Promise<void> => {
     } catch (error) {
         console.error("Error fetching fields:", error);
         res.status(500).json({ error: "Error fetching fields" });
+    }
+});
+// Route to delete a field by its fieldName
+router.delete("/delete/:fieldName", async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { fieldName } = req.params;
+
+        // Call the deleteField function from the data store
+        const deletedField = await deleteField(fieldName);
+
+        // Send the deleted field as a response
+        res.status(200).json(deletedField);
+    } catch (error) {
+        console.error("Error deleting field:", error);
+
+        // Handle 'unknown' type for error and ensure it has a 'message'
+        if (error instanceof Error) {
+            res.status(500).json({ error: error.message || "Error deleting field" });
+        } else {
+            res.status(500).json({ error: "An unknown error occurred" });
+        }
     }
 });
 
