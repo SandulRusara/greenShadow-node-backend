@@ -26,7 +26,7 @@ model Crop {
 
 model Equipment {
   id        Int       @id @default(autoincrement())
-  equipName String
+  equipName String    @unique
   equipType EquipType
   status    Status
   staffId   Int?

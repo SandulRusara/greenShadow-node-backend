@@ -1,65 +1,105 @@
-import { PrismaClient } from '@prisma/client';
-import Equipment from "../model/Equpment";
-
+import { PrismaClient, EquipType, Status } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function addEquipment(e: Equipment) {
+export async function addEquipment(e: {
+    equipName: string;
+    equipType: string;
+    status: string;
+    staffId?: number;  // staffId as a number (optional)
+    fieldId: number;
+}) {
     try {
-        const addedEquipment = await prisma.equipment.create({
-            data: {
-                equipmentCode: e.equipmentCode,
-                name: e.name,
-                type: e.type,
-                status: e.status,
-                availableCount: e.availableCount,
-                staffCodeList: e.staffCodeList,
-                fieldList: e.fieldList
-            }
-        });
-        console.log("Equipment added:", addedEquipment);
-        return addedEquipment;
-    } catch (err) {
-        console.log("Error adding equipment", err);
-    }
-}
+        // Convert string to Prisma enum type
+        const equipTypeEnum = e.equipType as EquipType;
+        const statusEnum = e.status as Status;
 
-export async function deleteEquipment(equipmentCode: string) {
-    try {
-        const deletedEquipment = await prisma.equipment.delete({
-            where: { equipmentCode: equipmentCode }
-        });
-        console.log("Equipment deleted:", deletedEquipment);
-        return deletedEquipment;
-    } catch (err) {
-        console.log("Error deleting equipment", err);
-    }
-}
-
-export async function updateEquipment(equipmentCode: string, e: Equipment) {
-    try {
-        const updatedEquipment = await prisma.equipment.update({
-            where: { equipmentCode: e.equipmentCode },
+        // Create the equipment in the database
+        const newEquipment = await prisma.equipment.create({
             data: {
-                name: e.name,
-                type: e.type,
-                status: e.status,
-                availableCount: e.availableCount,
-                staffCodeList: e.staffCodeList,
-                fieldList: e.fieldList
-            }
+                equipName: e.equipName,
+                equipType: equipTypeEnum,
+                status: statusEnum,
+                staffId: e.staffId || null,  // Handle optional staffId
+                fieldId: e.fieldId,
+            },
         });
-        console.log("Equipment updated:", updatedEquipment);
-        return updatedEquipment;
+
+        return newEquipment;
     } catch (err) {
-        console.log("Error updating equipment", err);
+        console.error("Error adding equipment:", err);
+        throw new Error("Failed to add equipment");
     }
 }
 
 export async function getAllEquipment() {
     try {
-        return await prisma.equipment.findMany();
+        // Retrieve all equipment from the database
+        const equipmentList = await prisma.equipment.findMany({
+            include: {
+                staff: true, // Optionally include related staff info
+                field: true, // Optionally include related field info
+            },
+        });
+
+        return equipmentList;
     } catch (err) {
-        console.log("Error getting equipment from Prisma data", err);
+        console.error("Error retrieving all equipment:", err);
+        throw new Error("Failed to retrieve equipment");
+    }
+}
+
+// Delete equipment by name
+export async function deleteEquipment(equipName: string) {
+    try {
+        const deletedEquipment = await prisma.equipment.delete({
+            where: { equipName },
+        });
+
+        return deletedEquipment;
+    } catch (err) {
+        console.error("Error deleting equipment:", err);
+        throw new Error("Failed to delete equipment");
+    }
+}
+
+export async function updateEquipment(equipName: string, updatedData: {
+    equipName?: string;
+    equipType?: string;  // Accepting string here, but need to cast to enum
+    status?: string;     // Accepting string here, but need to cast to enum
+    staffId?: number;    // staffId as a number (optional)
+    fieldId?: number;    // fieldId is now optional, but it can be updated if provided
+}) {
+    try {
+        // Cast equipType and status to the appropriate enums
+        const equipTypeEnum = updatedData.equipType ? updatedData.equipType as EquipType : undefined;
+        const statusEnum = updatedData.status ? updatedData.status as Status : undefined;
+
+        // Prepare the data object for the update
+        const updateData: any = {
+            equipName: updatedData.equipName,
+            equipType: equipTypeEnum,
+            status: statusEnum,
+            staffId: updatedData.staffId,
+            fieldId: updatedData.fieldId
+        };
+
+        // Remove any undefined fields from the data object
+        for (const key in updateData) {
+            if (updateData[key] === undefined) {
+                delete updateData[key];
+            }
+        }
+
+        // Update the equipment
+        const updatedEquipment = await prisma.equipment.update({
+            where: { equipName },
+            data: updateData,
+        });
+
+        return updatedEquipment;
+    } catch (err) {
+        console.error("Error updating equipment:", err);
+        throw new Error("Failed to update equipment");
     }
 }
