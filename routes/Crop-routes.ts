@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
-import {addCrop, deleteCrop, getAllCrops, updateCrop} from "../database/Crop-data-store"; // Import PrismaClient for database interaction
+import {addCrop, deleteCrop, getAllCrops, getAllCropsName, updateCrop} from "../database/Crop-data-store"; // Import PrismaClient for database interaction
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post("/saveCrop", upload.single("cropImage"), async (req: Request, res: Response): Promise<void> => {
+router.post("/add", upload.single("cropImage"), async (req: Request, res: Response): Promise<void> => {
     try {
         const { commonName, scientificName, category, fieldId } = req.body;
 
@@ -83,6 +83,19 @@ router.put("/update/:commonName", upload.single("cropImage"), async (req: Reques
     }
 });
 
+// Route to get all crop names
+router.get("/crops", async (req: Request, res: Response): Promise<void> => {
+    try {
+        // Call the getAllCropsName function
+        const crops = await getAllCropsName();
+
+        // Return the crop names as JSON
+        res.status(200).json(crops);
+    } catch (error) {
+        console.error("Error fetching crop names:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 export default router;
 
 

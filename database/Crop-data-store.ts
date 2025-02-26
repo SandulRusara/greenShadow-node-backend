@@ -106,4 +106,19 @@ export async function updateCrop(commonName: string, cropData: any) {
     }
 }
 
+// Function to get all crop names from the database
+export async function getAllCropsName() {
+    try {
+        const crops = await prisma.crop.findMany({
+            select: {
+                commonName: true,  // Use the correct field name (commonName)
+            },
+        });
+        return crops;
+    } catch (error) {
+        console.error("Error fetching crop names:", error);
+        throw new Error("Failed to fetch crop names");
+    }
+}
+
 

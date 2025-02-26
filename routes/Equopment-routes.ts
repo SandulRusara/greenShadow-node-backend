@@ -40,7 +40,7 @@ router.post("/saveEquipment", async (req: Request, res: Response): Promise<void>
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-router.get("/getAllEquipment", async (req: Request, res: Response): Promise<void> => {
+router.get("/view", async (req: Request, res: Response): Promise<void> => {
     try {
         const equipmentList = await getAllEquipment();
         res.status(200).json(equipmentList);
